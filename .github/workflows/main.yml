@@ -9,10 +9,10 @@ jobs:
 
   steps:
   -name: checkout code
-   uses: actions/checkout@V4
+   uses: actions/checkout@v4
 
   -name: set uo python
-   uses: actins/setup-python@V4
+   uses: actins/setup-python@v4
    with:
     python_version: 3.8
 
