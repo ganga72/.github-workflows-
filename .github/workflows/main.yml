@@ -1,23 +1,42 @@
-name: CI
+name: Bandit Security Scan
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
- sast_scan:
-  name: Run Bandit scan
-  runs-on: Ubuntu-latest
+  security_scan:
+    name: Run Bandit Security Scan
+    runs-on: ubuntu-latest
 
-  steps:
-  -name: checkout code
-   uses: actions/checkout@v2
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-  -name: set uo python
-   uses: actins/setup-python@v2
-   with:
-    python_version: 3.8
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
 
-   -name: install Bandit
-    run: pip install bandit
+      - name: Install Bandit
+        run: pip install bandit
 
-   -name: Run Bandit scan
-    run: bandit -r .
+      - name: Run Bandit Scan
+        run: bandit -r . --configfile bandit.yml -f json -o bandit_report.json
+
+      - name: Upload Bandit Report as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-security-report
+          path: bandit_report.json
+
+      - name: Fail if Vulnerabilities Found
+        run: |
+          if grep -q '"issue_severity": "HIGH"' bandit_report.json; then
+            echo "High severity vulnerabilities found!"
+            exit 1
+          fi
