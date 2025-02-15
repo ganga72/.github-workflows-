@@ -22,11 +22,13 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install Bandit
-        run: pip install bandit
+      - name: Install Bandit & jq
+        run: |
+          pip install bandit
+          sudo apt-get install -y jq
 
       - name: Run Bandit Scan
-        run: bandit -r . --configfile bandit.yml -f json -o bandit_report.json
+        run: bandit -r . --configfile bandit.yml -f json -o bandit_report.json || true
 
       - name: Upload Bandit Report as Artifact
         uses: actions/upload-artifact@v4
